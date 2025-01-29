@@ -1,11 +1,11 @@
 package com.devtech.gestiondestock.services;
 
+import java.util.List;
+
 import com.devtech.gestiondestock.dto.ArticleDto;
 import com.devtech.gestiondestock.dto.LigneCommandeClientDto;
 import com.devtech.gestiondestock.dto.LigneCommandeFournisseurDto;
 import com.devtech.gestiondestock.dto.LigneVenteDto;
-
-import java.util.List;
 
 public interface ArticleService {
     ArticleDto save(ArticleDto dto);

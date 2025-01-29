@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ArticleServiceImpl implements ArticleService {
 
+    private static final String ARTICLE_ALREADY_USED = "Article already used";
+    private static final String OPERATION_IMPOSSIBLE = "Operation impossible : une ou plusieur commande / vente existe deja pour cette article";
     private ArticleRepository articleRepository;
     private LigneVenteRepository venteRepository;
     private LigneCommandeClientRepository commandeClientRepository;
@@ -38,13 +40,13 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public ArticleDto save(ArticleDto dto) {
         List<String> errors = ArticleValidator.validate(dto);
-        if (!errors.isEmpty()){
+        if (!errors.isEmpty()) {
             log.error("Article is not valide {}", dto);
             throw new InvalidEntityException("L'article n'est pas valide", ErrorsCode.ARTICLE_NOT_VALID, errors);
         }
         Optional<Category> category = this.categoryRepository.findById(dto.getCategory().getId());
         if (!category.isPresent()){
-            log.warn("Catehory with ID {} was not found in the DB", dto.getCategory().getId());
+            log.warn("Category with ID {} was not found in the DB", dto.getCategory().getId());
             throw new EntityNotFoundException(
                     "La categorie avec l'Id = "
                             + dto.getCategory().getId() +
@@ -147,23 +149,24 @@ public class ArticleServiceImpl implements ArticleService {
 
     private void checkArticleBeforDelete(Integer idArticle){
 
+
         if (!CollectionUtils.isEmpty(findHistoriqueCommandeClient(idArticle))) {
-            log.error("Article alredy used");
-            throw new InvalidOpperatioException("Operaton impossible : une ou plusieur commande / vente existe deja pour cette article",
+            log.error(ARTICLE_ALREADY_USED);
+            throw new InvalidOpperatioException(OPERATION_IMPOSSIBLE,
                     ErrorsCode.ARTICLE_ALREADY_IN_USE
             );
         }
 
         if (!CollectionUtils.isEmpty(findHistoriqueCommandeFournisseur(idArticle))) {
-            log.error("Article alredy used");
-            throw new InvalidOpperatioException("Operaton impossible : une ou plusieur commande / vente existe deja pour cette article",
+            log.error(ARTICLE_ALREADY_USED);
+            throw new InvalidOpperatioException(OPERATION_IMPOSSIBLE,
                     ErrorsCode.ARTICLE_ALREADY_IN_USE
             );
         }
 
         if (!CollectionUtils.isEmpty(findHistoriqueVente(idArticle))) {
-            log.error("Article alredy used");
-            throw new InvalidOpperatioException("Operaton impossible : une ou plusieur commande / vente existe deja pour cette article",
+            log.error(ARTICLE_ALREADY_USED);
+            throw new InvalidOpperatioException(OPERATION_IMPOSSIBLE,
                     ErrorsCode.ARTICLE_ALREADY_IN_USE
             );
         }
